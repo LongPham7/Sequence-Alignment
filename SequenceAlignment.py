@@ -1,8 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-
-from ControlFrame import ControlFrame
-from ResultFrame import ResultFrame
+from Frames import ControlFrame, ResultFrame
 
 class AppFrame(object):
     
@@ -29,6 +27,7 @@ class AppFrame(object):
 def main():
     root = Tk()
     app = AppFrame(root)
+
     # Add padding to all widgets in the root.
     for child in root.winfo_children(): 
         child.grid_configure(padx = 3, pady = 3)
