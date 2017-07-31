@@ -2,104 +2,112 @@ from tkinter import *
 from tkinter import ttk
 from Bio import pairwise2
 
-def global_alignment():
-    """Align two sequences globally"""
-    first = first_seq.get()
-    second = second_seq.get()
-    alignments = pairwise2.align.globalms(first, second, \
-        match_score.get(), mismatch_score.get(), gap_opening.get(), \
-        gap_extension.get(), one_alignment_only = True)
-    text = pairwise2.format_alignment(*alignments[0])
-    result.delete(1.0, END)
-    result.insert(1.0, text)
+class AppFrame(object):
+    
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Sequence Alignment")
+        self.controlFrame = ttk.Frame(self.master, padding = 5, relief = 'solid')
+        self.resultFrame = ttk.Frame(self.master, padding = 5, relief = 'solid')
 
-def local_alignment():
-    """Align two sequences locally"""
-    first = first_seq.get()
-    second = second_seq.get()
-    alignments = pairwise2.align.localms(first, second, \
-        match_score.get(), mismatch_score.get(), gap_opening.get(), \
-        gap_extension.get(), one_alignment_only = True)
-    text = pairwise2.format_alignment(*alignments[0])
-    result.delete(1.0, END)
-    result.insert(1.0, text)
+        self.first_seq = StringVar()
+        self.second_seq = StringVar()
+        self.match_score  = DoubleVar()
+        self.mismatch_score = DoubleVar()
+        self.gap_opening = DoubleVar()
+        self.gap_extension = DoubleVar()
+        self.score = StringVar()
 
-root = Tk()
-root.title('Sequence Alignment')
-controlFrame = ttk.Frame(root, padding = 5, relief = 'solid')
-resultFrame = ttk.Frame(root, padding = 5, relief = 'solid')
+        # Default scoring scheme for sequence alignment
+        self.match_score.set(3.0)
+        self.mismatch_score.set(1.0)
+        self.gap_opening.set(-1.0)
+        self.gap_extension.set(-0.5)
+        self.score.set("Alignment score:")
 
-first_seq = StringVar()
-second_seq = StringVar()
-match_score  = DoubleVar()
-mismatch_score = DoubleVar()
-gap_opening = DoubleVar()
-gap_extension = DoubleVar()
-score = StringVar()
+        self.label1 = ttk.Label(self.controlFrame, text = 'Specify two DNA sequences with bases A, T, G, and C')
+        self.label2 = ttk.Label(self.controlFrame, text = 'First sequence')
+        self.label3 = ttk.Label(self.controlFrame, text = 'Second sequence')
+        self.label4 = ttk.Label(self.controlFrame, text = 'Match score')
+        self.label5 = ttk.Label(self.controlFrame, text = 'Mismatch score')
+        self.label6 = ttk.Label(self.controlFrame, text = 'Gap oepning')
+        self.label7 = ttk.Label(self.controlFrame, text = 'Gap extension')
 
-# Default scoring scheme for sequence alignment
-match_score.set(3.0)
-mismatch_score.set(1.0)
-gap_opening.set(-1.0)
-gap_extension.set(-0.5)
-score.set("Alignment score:")
+        self.label8 = ttk.Label(self.resultFrame, text = 'Result of sequence alignment:')
 
-label1 = ttk.Label(controlFrame, text = 'Specify two DNA sequences with bases A, T, G, and C')
-label2 = ttk.Label(controlFrame, text = 'First sequence')
-label3 = ttk.Label(controlFrame, text = 'Second sequence')
-label4 = ttk.Label(controlFrame, text = 'Match score')
-label5 = ttk.Label(controlFrame, text = 'Mismatch score')
-label6 = ttk.Label(controlFrame, text = 'Gap oepning')
-label7 = ttk.Label(controlFrame, text = 'Gap extension')
+        self.button1 = ttk.Button(self.controlFrame, text = 'Global alignment', command = self.global_alignment)
+        self.button2 = ttk.Button(self.controlFrame, text = 'Local alignment', command = self.local_alignment)
 
-label8 = ttk.Label(resultFrame, text = 'Result of sequence alignment:')
+        self.result = Text(self.resultFrame, width = 40, height = 10)
 
-button1 = ttk.Button(controlFrame, text = 'Global alignment', command = global_alignment)
-button2 = ttk.Button(controlFrame, text = 'Local alignment', command = local_alignment)
+        self.entry1 = ttk.Entry(self.controlFrame, textvariable = self.first_seq)
+        self.entry2 = ttk.Entry(self.controlFrame, textvariable = self.second_seq)
+        self.entry3 = ttk.Entry(self.controlFrame, textvariable = self.match_score)
+        self.entry4 = ttk.Entry(self.controlFrame, textvariable = self.mismatch_score)
+        self.entry5 = ttk.Entry(self.controlFrame, textvariable = self.gap_opening)
+        self.entry6 = ttk.Entry(self.controlFrame, textvariable = self.gap_extension)
 
-result = Text(resultFrame, width = 40, height = 10)
+        self.controlFrame.grid(column = 0, row = 0)
+        self.resultFrame.grid(column = 0, row = 1)
 
-entry1 = ttk.Entry(controlFrame, textvariable = first_seq)
-entry2 = ttk.Entry(controlFrame, textvariable = second_seq)
-entry3 = ttk.Entry(controlFrame, textvariable = match_score)
-entry4 = ttk.Entry(controlFrame, textvariable = mismatch_score)
-entry5 = ttk.Entry(controlFrame, textvariable = gap_opening)
-entry6 = ttk.Entry(controlFrame, textvariable = gap_extension)
+        self.label1.grid(column = 0, row = 0, columnspan = 2)
+        self.label2.grid(column = 0, row = 1, sticky = W)
+        self.label3.grid(column = 0, row = 2, sticky = W)
+        self.label4.grid(column = 0, row = 3, sticky = W)
+        self.label5.grid(column = 0, row = 4, sticky = W)
+        self.label6.grid(column = 0, row = 5, sticky = W)
+        self.label7.grid(column = 0, row = 6, sticky = W)
 
-controlFrame.grid(column = 0, row = 0)
-resultFrame.grid(column = 0, row = 1)
+        self.button1.grid(column = 2, row = 5, sticky = (N, S, E, W))
+        self.button2.grid(column = 2, row = 6, sticky = (N, S, E, W))
 
-label1.grid(column = 0, row = 0, columnspan = 2)
-label2.grid(column = 0, row = 1, sticky = W)
-label3.grid(column = 0, row = 2, sticky = W)
-label4.grid(column = 0, row = 3, sticky = W)
-label5.grid(column = 0, row = 4, sticky = W)
-label6.grid(column = 0, row = 5, sticky = W)
-label7.grid(column = 0, row = 6, sticky = W)
+        self.entry1.grid(column = 1, row = 1)
+        self.entry2.grid(column = 1, row = 2)
+        self.entry3.grid(column = 1, row = 3)
+        self.entry4.grid(column = 1, row = 4)
+        self.entry5.grid(column = 1, row = 5)
+        self.entry6.grid(column = 1, row = 6)
 
-button1.grid(column = 2, row = 5, sticky = (N, S, E, W))
-button2.grid(column = 2, row = 6, sticky = (N, S, E, W))
+        self.label8.grid(column = 0, row = 0, sticky = W)
+        self.result.grid(column = 0, row = 1, columnspan = 2)
 
-entry1.grid(column = 1, row = 1)
-entry2.grid(column = 1, row = 2)
-entry3.grid(column = 1, row = 3)
-entry4.grid(column = 1, row = 4)
-entry5.grid(column = 1, row = 5)
-entry6.grid(column = 1, row = 6)
+        # Add padding to all widgets in the control frame.
+        for child in self.controlFrame.winfo_children(): 
+            child.grid_configure(padx = 3, pady = 3)
 
-label8.grid(column = 0, row = 0, sticky = W)
-result.grid(column = 0, row = 1, columnspan = 2)
+        # Add padding to all widgets in the result frame.
+        for child in self.resultFrame.winfo_children(): 
+            child.grid_configure(padx = 3, pady = 3)
 
-# Add padding to all widgets in the control frame.
-for child in controlFrame.winfo_children(): 
-    child.grid_configure(padx = 3, pady = 3)
+    def global_alignment(self):
+        """Align two sequences globally"""
+        first = self.first_seq.get()
+        second = self.second_seq.get()
+        alignments = pairwise2.align.globalms(first, second, \
+            self.match_score.get(), self.mismatch_score.get(), self.gap_opening.get(), \
+            self.gap_extension.get(), one_alignment_only = True)
+        text = pairwise2.format_alignment(*alignments[0])
+        self.result.delete(1.0, END)
+        self.result.insert(1.0, text)
 
-# Add padding to all widgets in the result frame.
-for child in resultFrame.winfo_children(): 
-    child.grid_configure(padx = 3, pady = 3)
+    def local_alignment(self):
+        """Align two sequences locally"""
+        first = self.first_seq.get()
+        second = self.second_seq.get()
+        alignments = pairwise2.align.localms(first, second, \
+            self.match_score.get(), self.mismatch_score.get(), self.gap_opening.get(), \
+            self.gap_extension.get(), one_alignment_only = True)
+        text = pairwise2.format_alignment(*alignments[0])
+        self.result.delete(1.0, END)
+        self.result.insert(1.0, text)
 
-# Add padding to all widgets in the root.
-for child in root.winfo_children(): 
-    child.grid_configure(padx = 3, pady = 3)
+def main():
+    root = Tk()
+    app = AppFrame(root)
+    # Add padding to all widgets in the root.
+    for child in root.winfo_children(): 
+        child.grid_configure(padx = 3, pady = 3)
+    root.mainloop()
 
-root.mainloop()
+if __name__ == '__main__':
+    main()
